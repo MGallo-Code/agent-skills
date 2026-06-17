@@ -12,7 +12,11 @@ packages a concrete claim, decision, or diff and asks other-vendor models to ref
 not to praise it (which avoids the sycophancy that makes "what do you think?" useless).
 Cross-vendor matters: a model is blind to its own failure modes, and a different vendor
 surfaces bugs single-model review misses (Arbiter, arXiv:2603.08993, found a real
-Gemini-CLI memory bug for $0.27 that single-model missed).
+Gemini-CLI memory bug for $0.27 that single-model missed). The panel also seats a
+FRESH-CONTEXT Claude (the dispatch worker, given the same packaged prompt): the main loop that
+WROTE the claim is its worst judge, so a fresh Claude strips that author bias. It is a peer to
+the two vendors, not a replacement - cross-vendor stays the PRIMARY diversity (a same-vendor
+voice shares some blind spots); the fresh Claude's job is removing the author's bias.
 
 This is the ONE multi-model technique the kit keeps. It explicitly rejects the others:
 weight-merging (impossible on hosted models), mixed-model MoA (Self-MoA wins), and
@@ -44,8 +48,12 @@ it (headless auth is unreliable).
    context-hygiene delegation: one worker, motive = context-rot, not parallelism - it
    does NOT violate the convergent/few-agent rule) and pass it the framed prompt
    EXPLICITLY (a fresh worker, not a context-inheriting fork, unless the decision truly
-   needs the full conversation). The worker just runs CLIs + light synthesis, so it can
-   be a cheaper model; the intelligence is in the vendors' replies.
+   needs the full conversation). Because the worker is a FRESH-CONTEXT Claude (the fresh worker above, not a
+   context-inheriting fork), it is also an INDEPENDENT refuting voice the author lacks: have it
+   (a) refute the claim ITSELF from that fresh context - stripping the bias of the main loop
+   that wrote the claim - THEN (b) run the vendor CLIs. It is now a refuter on the panel, not
+   just a dispatcher, so use a CAPABLE model; the intelligence is in all three replies, not
+   only the vendors'.
 3. **The worker runs the other-vendor CLIs, read-only/sandboxed.** Never `--yolo` /
    `danger-full-access`. macOS has no `timeout`; use `gtimeout` or the harness timeout.
    ```bash
@@ -62,15 +70,17 @@ it (headless auth is unreliable).
    explicit `codex`/`gemini` Bash allowlist; running it in the main loop trades away the
    worker context-hygiene benefit, so distill the raw output yourself before continuing.
    If a CLI is unauthenticated or errors, report that vendor as "unavailable" rather than
-   failing the whole pass; NEVER fabricate a vendor response.
+   failing the whole pass (the fresh-context Claude refutation still stands); NEVER fabricate a
+   vendor response.
 4. **The worker returns ONLY the distilled verdict:** the key agreements, the
    DISAGREEMENTS verbatim-enough to be actionable (do NOT over-compress away the dissent
-   - it is the whole point), and each vendor's strongest counter-argument. Not the raw
-   transcripts.
-5. **You synthesize a PROPOSAL.** Combine the vendors' refutations WITH your own view
-   into: (a) the claim's strongest surviving objection, (b) whether it changes the
-   decision, (c) a recommended action. Adversarial/diversity synthesis, never a vote
-   count. PROPOSE; never auto-apply.
+   - it is the whole point), and each refuter's strongest counter-argument (the fresh-context
+   Claude, Codex, and Gemini). Not the raw transcripts.
+5. **You synthesize a PROPOSAL.** Combine the THREE independent refutations (fresh-Claude +
+   Codex + Gemini) into: (a) the claim's strongest surviving objection, (b) whether it changes
+   the decision, (c) a recommended action. Your own (author) view is the claim UNDER TEST, not
+   a fourth refuting vote - do not let it overrule the panel. Adversarial/diversity synthesis,
+   never a vote count. PROPOSE; never auto-apply.
 
 ## Common Rationalizations (reject these)
 
