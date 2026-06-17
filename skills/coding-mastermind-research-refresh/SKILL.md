@@ -40,7 +40,11 @@ or the tooling baseline (that is `coding-mastermind-update`).
    the dead link, correct the number, update the verdict with the new citation. Do not
    reword for style or restructure ("don't drift the docs").
 4. **Write a dated research-delta** summarizing what changed (the reusable form of the
-   research handoff), so the next refresh and the kit's maintainers see the diff.
+   research handoff), so the next refresh and the kit's maintainers see the diff. Use a
+   DISTINCT dated filename and never overwrite an existing file (read before write): a
+   delta is a NEW artifact, not an edit of a prior one - reusing a prior delta's or a seed
+   research handoff's name silently clobbers it (the exact stale/lost-doc failure the kit
+   exists to prevent).
 5. **Reconcile with the kit.** If a moved verdict changes an ADR or a MANIFEST capability
    fact, flag it for `coding-mastermind-update` rather than editing kit files here.
 
