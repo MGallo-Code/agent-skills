@@ -43,17 +43,19 @@ than a hand-maintained copy that drifts. Keep the answer to under a screen.
    **The hands-off loop.** The locator reports which `INVARIANTS.md` rows the touched
    files are subject to; `compliance-guard` proposes drafting the enforcer in-PR when an
    invariant recurs or a new surface appears (the promotion trigger is the SECOND
-   recurrence). `coding-mastermind-audit` is the low-frequency backstop that catches what
-   the in-loop check missed.
+   recurrence). `coding-mastermind-invariant` mints a NEW row plus its enforcer when a
+   recurring problem has no row yet (or scaffolds one you name); `coding-mastermind-audit`
+   is the low-frequency backstop that catches what the in-loop check missed.
 
    **The cross-vendor cross-check (`coding-mastermind-cross-check`).** For RARE
    high-stakes or large-diff decisions only: it asks Codex + Gemini to REFUTE a claim
    (read-only/sandboxed) and synthesizes a proposal that preserves the disagreement. Not
    a majority vote. Skip it on Q&A and small edits.
 
-   **Maintenance.** `coding-mastermind-update` refreshes the tooling baseline against the
-   MANIFEST; `coding-mastermind-research-refresh` refreshes the knowledge wiki. Both
-   propose, never auto-apply.
+   **Maintenance.** `coding-mastermind-update` upgrades the agent CLIs (each via its real
+   install channel) and then re-stamps the MANIFEST baseline + re-verifies the capability
+   facts; `coding-mastermind-research-refresh` refreshes the knowledge wiki. The MANIFEST
+   and wiki edits propose, never auto-apply (the CLI upgrade is the one explicit action).
 
    **Canonical homes.** Concepts/why = the system wiki. Cross-repo rules =
    `global-rules/`. Skills + MANIFEST = `agent-skills/`. Per-repo invariants = that
@@ -71,5 +73,5 @@ than a hand-maintained copy that drifts. Keep the answer to under a screen.
 
 ## Related
 
-- Every `coding-mastermind-*` skill (init, cross-check, audit, update, research-refresh).
+- Every `coding-mastermind-*` skill (init, invariant, cross-check, audit, update, research-refresh).
 - The kit's `SPEC.md`, `PLAN.md`, `MANIFEST.md`.

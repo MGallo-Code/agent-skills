@@ -67,6 +67,7 @@ success and raise cost (ETH/Gloaguen, arXiv:2602.11988).
 - agent-skills (rail-distributed): `coding-mastermind-init` (scaffolds a layered
   CLAUDE.md + INVARIANTS stub + DoD/PR template), `coding-mastermind-cross-check`
   (Delta B), `coding-mastermind-audit` (Delta A.3 backstop),
+  `coding-mastermind-invariant` (mints new registry rows + their enforcers),
   `coding-mastermind-research-refresh`, `coding-mastermind-update`,
   `coding-mastermind-help` (Delta C). Plus `MANIFEST.md` and the Stop-tier hook
   framework (`hooks/hooks.json`).
