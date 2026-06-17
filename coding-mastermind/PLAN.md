@@ -70,6 +70,30 @@ tracked here as it lands.
         `SBIC/docs/decisions/` + WorkOS worked example + doc-drift fixes (12);
         completeness-critic pass (18).
 
+## Deferred sub-features (assessed 2026-06-17; handoff item 9/10/11b)
+
+Audited against disk and deferred with reason rather than built, to avoid net-new
+fail-closed gates on shared repos (scope + review cost + the over-engineering the kit
+exists to prevent). Build any ONE later only if a real regression recurs that it would
+have caught - default-with-evidence, not speculative.
+
+- **Blast-radius gate** (declare files, fail on undeclared touch): deferred - the PR
+  template already carries a prose "Blast radius" section; a mechanical
+  declared-vs-touched gate has weak signal (agents mis-declare) and high false-positive cost.
+- **Schema-codegen freshness gate**: NOT APPLICABLE - platform commits no generated
+  Supabase types, so nothing exists to diff. Revisit only if generated types get committed.
+- **Migration-ledger pre-read hook**: deferred - the CI collision/drift gates (INV-3) +
+  `feature.md` STEP 6 already enforce the outcome; a pre-read hook is redundant.
+- **FM5 soft spec-gate** (2-question spec preamble on `feature.md`): deferred - the global
+  `agent-skills.md` rule already nudges clarify->spec->plan, and `feature.md` STEP 1/2
+  (locate + reuse-vs-add plan) cover the intent without added ceremony.
+- **Churn-counter WARNING** (file touched >=3x across >=3 PRs, no ADR): deferred -
+  net-new cross-PR-history script; low recurrence today; soft warning only.
+- **gitleaks PreToolUse relocation**: deferred - already logged as an INV-6 candidate; CI
+  gitleaks (INV-6) is the agent-neutral backstop and fires on every PR.
+- **No-orphan plan clause / plan-approval write-lock**: deferred - optional in the spec; no
+  recurrence signal to justify the friction.
+
 ## Guardrails for the build
 
 - No commit/push/PR/merge without explicit per-action permission. Never self-merge.
