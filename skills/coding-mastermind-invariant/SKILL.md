@@ -56,6 +56,10 @@ single occurrence is a fix, not an invariant).
    clears all three tests.
 5. **For each survivor, run the scaffolding** (next section): row + enforcer + revert-test.
 6. **Rank and present SHORT.** Highest-recurrence / highest-leverage first; say what you cut.
+7. **Surface non-invariant byproducts.** If the sweep turned up a concrete live bug or a
+   worthwhile one-off cleanup that does NOT clear the bar, report it SEPARATELY as a
+   non-invariant finding (a fix / PR, not a registry row) - never discard it. A run that
+   mints zero invariants but finds two real bugs still paid for itself.
 
 ## Mode: add `<description>`
 
