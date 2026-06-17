@@ -42,6 +42,12 @@ edit `INVARIANTS.md` directly).
    - `CLAUDE.md` - if ABSENT, from `templates/CLAUDE.md.template` (short, layered,
      points at `INVARIANTS.md`). If PRESENT, do NOT rewrite it; add a one-line pointer
      to `INVARIANTS.md` near the top if missing.
+   - `AGENTS.md` - the cross-tool constitution Codex/Cursor/Gemini read. If absent,
+     create it as a byte-identical copy of `CLAUDE.md` so non-Claude agents get the
+     SAME per-repo context, and offer a pre-commit `cmp -s AGENTS.md CLAUDE.md` copy to
+     keep them identical. WITHOUT this the repo is Claude-only at Layer 2 (the portable
+     layer is still CI + the synced global rules, but the per-repo constitution would
+     not reach the other agents).
 3. **Seed the first invariant.** Walk the user through one real invariant for this
    repo: its end-state (not a banned verb), the single enforcement point, and the
    gate. Add it as the first `INVARIANTS.md` row. If it has no gate yet, mark it
