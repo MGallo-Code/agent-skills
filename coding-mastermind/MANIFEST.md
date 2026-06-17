@@ -6,17 +6,19 @@ versions against. This is the system-level analog of a `package-lock.json`.
 
 - **Kit version:** v1.0
 - **Implementation date:** 2026-06-16
+- **Last re-stamped:** 2026-06-17 (CLI versions re-verified on the upgraded tools; the
+  codex-exec sandbox-default change folded into the capability facts below)
 - **Built/verified on:** macOS (darwin). Note: `timeout` is absent on macOS; use
   `gtimeout` (coreutils) or the harness timeout. `gtimeout` was NOT installed at
   build time.
 
-## Agent-platform baseline (installed versions at build, disk-verified)
+## Agent-platform baseline (disk-verified; built 2026-06-16, re-verified 2026-06-17)
 
-| Tool | Version at build | Notes |
+| Tool | Baseline version | Notes |
 |------|------------------|-------|
-| Claude Code | 2.1.179 | latest published at build (`npm view @anthropic-ai/claude-code version` = 2.1.179) |
-| Codex CLI | 0.139.0 | model GPT-5.5; `codex exec --skip-git-repo-check` runs read-only/sandboxed |
-| Gemini CLI | 0.45.0 | `gemini --skip-trust --approval-mode plan` is read-only plan mode. Free Code Assist login ends 2026-06-18, metered after |
+| Claude Code | 2.1.179 | unchanged since build (`npm view @anthropic-ai/claude-code version`) |
+| Codex CLI | 0.140.0 | model GPT-5.5; Homebrew cask. `codex exec` now defaults to `--sandbox read-only` (was `workspace-write` on 0.139.0) - still pass `-s read-only` explicitly; the default is version-volatile |
+| Gemini CLI | 0.46.0 | `gemini --skip-trust --approval-mode plan` is read-only plan mode (re-confirmed on 0.46.0 `--help`). Free Code Assist login ends 2026-06-18, metered after |
 | node | 22.17.1 | the gate checks are plain ESM `.mjs` |
 | npm | 11.11.0 | |
 | git | 2.50.1 (Apple) | |
@@ -35,13 +37,16 @@ versions against. This is the system-level analog of a `package-lock.json`.
   constitution/rules file every agent reads. Hooks are Claude-Code-specific. The
   invariant LIVES in CI; each agent gets the best in-loop enforcement its own harness
   supports (Codex has `/review` + an OS sandbox; Gemini has its own).
-- **Cross-vendor CLI dispatch (the cross-check skill), verified 2026-06-16:** `codex exec`
-  defaults to `--sandbox workspace-write`, NOT read-only - pass `--sandbox read-only`
-  (`-s read-only`) explicitly or the dispatch is not read-only. And a Claude Code
-  Task/Workflow SUBAGENT's sandbox classifier blocks the vendor-CLI call as private-source
-  exfiltration, so the dispatch must run in the main loop (sandbox disabled for that call)
-  or behind an explicit `codex`/`gemini` Bash allowlist; the worker context-hygiene benefit
-  is then traded off. Re-check both on update.
+- **Cross-vendor CLI dispatch (the cross-check skill), re-verified 2026-06-17:** the
+  `codex exec` sandbox default is VERSION-VOLATILE - `workspace-write` on 0.139.0,
+  `read-only` on 0.140.0 (disk-verified via the `codex exec` session header, both in and
+  out of a git repo). So ALWAYS pass `--sandbox read-only` (`-s read-only`) explicitly and
+  never depend on the default. `gemini --approval-mode plan` remains read-only (0.46.0
+  `--help` documents `plan (read-only mode)`). And a Claude Code Task/Workflow SUBAGENT's
+  sandbox classifier blocks the vendor-CLI call as private-source exfiltration, so the
+  dispatch must run in the main loop (sandbox disabled for that call) or behind an explicit
+  `codex`/`gemini` Bash allowlist; the worker context-hygiene benefit is then traded off.
+  Re-check both on update.
 
 ## Gate-tool baselines (recommended pins; install per-repo as needed)
 

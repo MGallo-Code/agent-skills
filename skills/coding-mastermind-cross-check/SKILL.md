@@ -49,13 +49,14 @@ it (headless auth is unreliable).
 3. **The worker runs the other-vendor CLIs, read-only/sandboxed.** Never `--yolo` /
    `danger-full-access`. macOS has no `timeout`; use `gtimeout` or the harness timeout.
    ```bash
-   codex exec --skip-git-repo-check --sandbox read-only "<refute prompt>" < /dev/null  # GPT-5.5; -s read-only is REQUIRED (codex exec defaults to workspace-write)
+   codex exec --skip-git-repo-check --sandbox read-only "<refute prompt>" < /dev/null  # GPT-5.5; pass -s read-only explicitly - the exec sandbox default is version-volatile
    gemini --skip-trust --approval-mode plan -p "<refute prompt>" < /dev/null            # read-only plan mode
    ```
-   The CLIs reach their own model API; that egress is the point. Two harness gotchas
-   verified 2026-06-16: (a) `codex exec` defaults to `--sandbox workspace-write`, so you
-   MUST pass `--sandbox read-only` (or `-s read-only`) to actually be read-only - the bare
-   command is NOT read-only. (b) In Claude Code a Task/Workflow SUBAGENT's sandbox
+   The CLIs reach their own model API; that egress is the point. Two harness gotchas:
+   (a) the `codex exec` sandbox default is version-volatile - `workspace-write` on 0.139.0,
+   `read-only` on 0.140.0 (disk-verified 2026-06-17) - so ALWAYS pass `--sandbox read-only`
+   (or `-s read-only`) explicitly and never depend on the default. (b) In Claude Code a
+   Task/Workflow SUBAGENT's sandbox
    classifier blocks the vendor-CLI call as private-source exfiltration, so the dispatch
    often has to run in the MAIN loop (Bash sandbox disabled for that call) or behind an
    explicit `codex`/`gemini` Bash allowlist; running it in the main loop trades away the
