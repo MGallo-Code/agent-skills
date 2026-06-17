@@ -16,6 +16,10 @@ tracked here as it lands.
   INVARIANTS instance): the SBIC tree (`platform/`, `.claude/`, `docs/`).
 - Charon specifics: the Charon repo.
 - The delivery rail config: `~/.dotfiles/manifest.sh` + `sync.sh`.
+- Claude's per-project memory (`~/.claude/projects/*/memory/`) is a SEPARATE, Claude-ONLY
+  layer (Codex/Gemini cannot read it): use it for Claude-private working context + personal
+  facts (which can't live in team-cloned repos anyway). Any DURABLE fact a non-Claude agent
+  also needs belongs in one of the homes ABOVE, surfaced by its enforcer - not in memory.
 
 ## Write-serialization rule (convergent, few-agent)
 
