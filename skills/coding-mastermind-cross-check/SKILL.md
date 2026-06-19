@@ -60,18 +60,36 @@ it (headless auth is unreliable).
    codex exec --skip-git-repo-check --sandbox read-only "<refute prompt>" < /dev/null  # GPT-5.5; pass -s read-only explicitly - the exec sandbox default is version-volatile
    gemini --skip-trust --approval-mode plan -p "<refute prompt>" < /dev/null            # read-only plan mode
    ```
-   The CLIs reach their own model API; that egress is the point. Two harness gotchas:
+   The CLIs reach their own model API; that egress is the point - but DEFAULT to sending a
+   concise summary (the framed claim + the minimal diff/code under test), NEVER the raw
+   workspace or whole files. Two harness gotchas:
    (a) the `codex exec` sandbox default is version-volatile - `workspace-write` on 0.139.0,
    `read-only` on 0.140.0 (disk-verified 2026-06-17) - so ALWAYS pass `--sandbox read-only`
    (or `-s read-only`) explicitly and never depend on the default. (b) In Claude Code a
-   Task/Workflow SUBAGENT's sandbox
-   classifier blocks the vendor-CLI call as private-source exfiltration, so the dispatch
-   often has to run in the MAIN loop (Bash sandbox disabled for that call) or behind an
-   explicit `codex`/`gemini` Bash allowlist; running it in the main loop trades away the
-   worker context-hygiene benefit, so distill the raw output yourself before continuing.
-   If a CLI is unauthenticated or errors, report that vendor as "unavailable" rather than
-   failing the whole pass (the fresh-context Claude refutation still stands); NEVER fabricate a
-   vendor response.
+   Task/Workflow SUBAGENT's sandbox classifier blocks the vendor-CLI call as private-source
+   exfiltration, so the dispatch often has to run in the MAIN loop (Bash sandbox disabled for
+   that call) or behind an explicit `codex`/`gemini` Bash allowlist; running it in the main
+   loop trades away the worker context-hygiene benefit, so distill the raw output yourself
+   before continuing.
+
+   **Export mode (what data leaves the boundary):**
+   - *Concise summary (DEFAULT):* the framed claim + the specific diff/snippet under test.
+     Enough for almost every cross-check; this is the normal path.
+   - *Raw file/workspace export (requires explicit human approval):* only when the vendor must
+     see the full tree. Flag it as a HIGH-RISK export, state plainly what is leaving the
+     boundary, get the operator's nod, THEN proceed. Never self-approve a raw export.
+
+   **Report each vendor with a STRUCTURED status, never a vague "unavailable"** (the
+   fresh-context Claude refutation still stands regardless; NEVER fabricate a vendor response):
+   - **CLI-missing** - the `codex`/`gemini` binary is not installed or not on PATH.
+   - **unauthenticated** - installed but no valid credentials (no API key / not logged in).
+   - **export-approval-needed** - a raw export was required but not approved; fall back to the
+     concise summary and report that.
+   - **policy-blocked** - the harness/CLI policy refused the export (e.g. the subagent sandbox
+     classifier). Report it AS policy-blocked; do NOT engineer a workaround or retry - the
+     block is a real constraint on the cross-check, not a puzzle to route around.
+   - **timeout** - no return within the `gtimeout`/harness window.
+   - **succeeded** - returned a verdict (note any degradation, e.g. only one model answered).
 4. **The worker returns ONLY the distilled verdict:** the key agreements, the
    DISAGREEMENTS verbatim-enough to be actionable (do NOT over-compress away the dissent
    - it is the whole point), and each refuter's strongest counter-argument (the fresh-context
@@ -98,6 +116,12 @@ it (headless auth is unreliable).
 - A majority-vote or averaged score in the output. That is the rejected technique.
 - The dissent compressed to "they mostly agreed." Surface the actual disagreement.
 - Any CLI invoked with write/network access. Read-only/sandboxed only.
+- A vendor reported as a vague "unavailable" instead of a structured status (CLI-missing /
+  unauthenticated / export-approval-needed / policy-blocked / timeout). The status is the
+  actionable signal.
+- Raw files or the workspace exported to a vendor CLI without explicit human approval, or a
+  policy-blocked export "worked around" in-agent. Concise summary is the default; a block is a
+  constraint, not a puzzle.
 - The proposal auto-applied. It proposes; the human (or you, after the human's nod)
   decides.
 
@@ -105,6 +129,10 @@ it (headless auth is unreliable).
 
 - The output names each vendor's verdict + strongest counter-argument, and a synthesized
   recommendation that preserves any disagreement.
+- Each vendor carries a STRUCTURED status (CLI-missing / unauthenticated / export-approval-
+  needed / policy-blocked / timeout / succeeded), never a vague "unavailable".
+- The export was the concise summary by default; any raw-file/workspace export was explicitly
+  approved by the human first, and a policy-blocked export is surfaced as such, not worked around.
 - The raw transcripts did NOT enter the main context (only the distilled verdict did).
 - No CLI ran with write/network/danger access.
 - It PROPOSED; nothing was applied.
