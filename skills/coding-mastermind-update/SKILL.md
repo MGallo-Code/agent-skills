@@ -51,8 +51,14 @@ takes effect on the NEXT launch, so finish first); when a tool is deliberately p
    |-------|---------|-----------------|
    | Claude Code (`@anthropic-ai/claude-code`) | npm global | `npm install -g @anthropic-ai/claude-code@latest` |
    | Gemini CLI (`@google/gemini-cli`) | npm global | `npm install -g @google/gemini-cli@latest` |
-   | Codex (`codex`) | Homebrew **cask** | `brew upgrade --cask codex` |
-   Run `brew update` once first so cask metadata is fresh. **Check-only mode: skip this step.**
+   | Codex (`@openai/codex`) | npm global, **PINNED** | `npm install -g @openai/codex@<MANIFEST pin>` (NOT `@latest`) |
+   All three are npm now: Codex moved off the macOS-only Homebrew cask 2026-06-21 so one
+   channel manages it on macOS AND WSL. Codex is PINNED to the MANIFEST version, not floated -
+   its `config.toml` MCP-server schema is version-volatile (a newer Codex writes a `transport`
+   field an older one rejects, which deadlocked sync's `codex mcp` re-wiring on WSL). To bump
+   Codex, change the MANIFEST pin deliberately, then install that exact version. After any
+   Codex install, confirm `which -a codex` resolves to the npm bin (no leftover cask).
+   **Check-only mode: skip this step.**
 4. **Verify after.** Re-run each `--version`; emit a `before -> after` table.
 5. **Re-stamp the MANIFEST + re-verify the load-bearing facts.** Open
    `coding-mastermind/MANIFEST.md`. Update the version table and the re-stamp date. Then
@@ -73,7 +79,8 @@ takes effect on the NEXT launch, so finish first); when a tool is deliberately p
 
 | Rationalization | Reality |
 |---|---|
-| "Just `npm install -g` everything." | Codex is a Homebrew cask; npm-installing it gives two copies and the wrong one shadows. Detect the channel. |
+| "Just `npm install -g` everything." | Right channel still matters: cross-installing (npm a brew tool, or vice-versa) leaves two copies on PATH and the wrong one shadows. All three agents are npm now, but Codex was a Homebrew cask until 2026-06-21 - after migrating, confirm `which -a codex` resolves to the npm bin, not a leftover cask. |
+| "Float Codex to `@latest` like the others." | Codex is PINNED on purpose: its `config.toml` MCP schema is version-volatile and floating reintroduced the drift that broke WSL. Bump the MANIFEST pin deliberately, then install that version. |
 | "Upgrade silently, latest is latest." | Show `current -> latest` first; a bump is exactly when a sandbox flag / approval mode / hook event changes (step 5). |
 | "Just bump the version numbers in the MANIFEST." | A version bump without diffing behavior misses the deprecation that breaks the kit. Diff the capability, not the string. |
 | "Apply the MANIFEST edits since I'm here." | Propose. The human owns the change to the system, exactly as with any architecture decision. |
@@ -81,7 +88,8 @@ takes effect on the NEXT launch, so finish first); when a tool is deliberately p
 
 ## Red Flags
 
-- `brew upgrade codex` WITHOUT `--cask` (silently no-ops a cask, looks like success).
+- A leftover Homebrew cask `codex` shadowing the npm copy on PATH after the 2026-06-21 migration (`which -a codex` must resolve to the npm bin; run `brew uninstall --cask codex` if a cask lingers).
+- Floating Codex to `@latest` instead of the MANIFEST pin (its config schema is version-volatile).
 - npm/brew cross-contamination (two copies on PATH).
 - An upgrade run that does not record the `before -> after` delta.
 - A capability change (sandbox default, approval mode, hook rename) noticed but not folded

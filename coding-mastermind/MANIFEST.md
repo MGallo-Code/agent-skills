@@ -6,8 +6,11 @@ versions against. This is the system-level analog of a `package-lock.json`.
 
 - **Kit version:** v1.0
 - **Implementation date:** 2026-06-16
-- **Last re-stamped:** 2026-06-17 (CLI versions re-verified on the upgraded tools; the
-  codex-exec sandbox-default change folded into the capability facts below)
+- **Last re-stamped:** 2026-06-21 (focused change: Codex migrated from the macOS-only
+  Homebrew cask to npm `@openai/codex`, PINNED to 0.141.0, so one cross-platform channel
+  manages it on macOS AND WSL - the cask could not be managed on WSL, which let Codex drift
+  on a second machine and break MCP wiring. Claude/Gemini baselines below are unchanged from
+  the 2026-06-17 re-verify; run a full `coding-mastermind-update` to re-stamp those.)
 - **Built/verified on:** macOS (darwin). Note: `timeout` is absent on macOS; use
   `gtimeout` (coreutils) or the harness timeout. `gtimeout` was NOT installed at
   build time.
