@@ -58,7 +58,9 @@ it (headless auth is unreliable).
    `danger-full-access`. macOS has no `timeout`; use `gtimeout` or the harness timeout.
    ```bash
    codex exec --skip-git-repo-check --sandbox read-only "<refute prompt>" < /dev/null  # GPT-5.5; pass -s read-only explicitly - the exec sandbox default is version-volatile
-   gemini --skip-trust --approval-mode plan -p "<refute prompt>" < /dev/null            # read-only plan mode
+   # Gemini: FLAGSHIP model + an ISOLATED empty workspace, else it confabulates (gotcha (c)):
+   d=$(mktemp -d); mkdir -p "$d/.gemini"; printf '{"context":{"includeDirectories":[]}}' > "$d/.gemini/settings.json"
+   ( cd "$d" && gemini --skip-trust --approval-mode plan --model gemini-2.5-pro -p "<refute prompt>" < /dev/null )  # read-only plan mode
    ```
    The CLIs reach their own model API; that egress is the point - but DEFAULT to sending a
    concise summary (the framed claim + the minimal diff/code under test), NEVER the raw
@@ -71,6 +73,16 @@ it (headless auth is unreliable).
    that call) or behind an explicit `codex`/`gemini` Bash allowlist; running it in the main
    loop trades away the worker context-hygiene benefit, so distill the raw output yourself
    before continuing.
+   (c) gemini-cli CONFABULATES two ways on a normal dev box: the configured default model is often
+   a tiny one (`gemini-3.1-flash-lite` here) that IGNORES the pasted code and invents file paths;
+   and its workspace file-discovery BLEEDS unrelated files from `context.includeDirectories` (and
+   cwd) into the review. FIX (both needed): pass `--model gemini-2.5-pro` (the flagship on this
+   key) AND run from an isolated empty dir whose workspace-local `.gemini/settings.json` sets
+   `context.includeDirectories: []`. Verified 2026-06-23: without both, gemini hallucinated the
+   SAME non-existent `~/.codex/.tmp/plugins/.../omniverse/EXECUTION.md` finding 4x (even isolated,
+   because the user's global `includeDirectories` reached `~/.codex`); with both, it returned a
+   clean, code-grounded verdict. Treat a gemini reply that cites files NOT in your pasted prompt as
+   confabulation (verified noise), not signal.
 
    **Export mode (what data leaves the boundary):**
    - *Concise summary (DEFAULT):* the framed claim + the specific diff/snippet under test.
