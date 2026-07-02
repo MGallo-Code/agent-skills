@@ -6,11 +6,12 @@ versions against. This is the system-level analog of a `package-lock.json`.
 
 - **Kit version:** v1.0
 - **Implementation date:** 2026-06-16
-- **Last re-stamped:** 2026-06-21 (focused change: Codex migrated from the macOS-only
-  Homebrew cask to npm `@openai/codex`, PINNED to 0.141.0, so one cross-platform channel
-  manages it on macOS AND WSL - the cask could not be managed on WSL, which let Codex drift
-  on a second machine and break MCP wiring. Claude/Gemini baselines below are unchanged from
-  the 2026-06-17 re-verify; run a full `coding-mastermind-update` to re-stamp those.)
+- **Last re-stamped:** 2026-07-01 (full update on WSL/Linux: Gemini CLI 0.46.0 -> 0.49.0;
+  Claude Code confirmed already latest at 2.1.198; Codex re-pinned 0.141.0 -> 0.142.4 to
+  match the installed/working binary (out-of-band drift; NOT floated to latest 0.142.5 - the
+  config.toml MCP schema stays version-volatile). Toolchain on this WSL box: node v22.23.1,
+  npm 10.9.8, git 2.34.1 - the macOS build-machine rows below are the original build record,
+  left as-is. Prior re-stamp 2026-06-21 migrated Codex off the macOS Homebrew cask to npm.)
 - **Built/verified on:** macOS (darwin). Note: `timeout` is absent on macOS; use
   `gtimeout` (coreutils) or the harness timeout. `gtimeout` was NOT installed at
   build time.
@@ -19,9 +20,9 @@ versions against. This is the system-level analog of a `package-lock.json`.
 
 | Tool | Baseline version | Notes |
 |------|------------------|-------|
-| Claude Code | 2.1.179 | unchanged since build (`npm view @anthropic-ai/claude-code version`) |
-| Codex CLI | 0.140.0 | model GPT-5.5; Homebrew cask. `codex exec` now defaults to `--sandbox read-only` (was `workspace-write` on 0.139.0) - still pass `-s read-only` explicitly; the default is version-volatile |
-| Gemini CLI | 0.46.0 | `gemini --skip-trust --approval-mode plan` is read-only plan mode (re-confirmed on 0.46.0 `--help`). Free Code Assist login ends 2026-06-18, metered after |
+| Claude Code | 2.1.198 | latest on 2026-07-01 (`npm view @anthropic-ai/claude-code version`); npm global |
+| Codex CLI | 0.142.4 | model GPT-5.5; npm global, PINNED (re-pinned 2026-07-01 to match installed; do NOT float to 0.142.5). `codex exec` sandbox default is version-volatile - always pass `-s read-only`; default not re-run empirically on 0.142.4 (mitigation makes it moot) |
+| Gemini CLI | 0.49.0 | `gemini --approval-mode plan` is read-only plan mode (re-confirmed 2026-07-01 on 0.49.0 `--help`: `plan (read-only mode)`). Free Code Assist login ended 2026-06-18, metered after |
 | node | 22.17.1 | the gate checks are plain ESM `.mjs` |
 | npm | 11.11.0 | |
 | git | 2.50.1 (Apple) | |
