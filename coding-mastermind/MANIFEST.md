@@ -6,14 +6,21 @@ versions against. This is the system-level analog of a `package-lock.json`.
 
 - **Kit version:** v1.0
 - **Implementation date:** 2026-06-16
-- **Last re-stamped:** 2026-07-02 (macOS update: removed stale Homebrew-prefix Claude
-  Code duplicate; active nvm-managed Claude Code 2.1.187 -> 2.1.198; Gemini CLI
-  0.47.0 -> 0.49.0; Codex kept pinned at 0.142.4 while npm latest is 0.142.5.
-  Verified `codex exec` default sandbox on this macOS machine is `danger-full-access`,
-  so cross-check must continue passing `-s read-only`. Toolchain: macOS 26.5.1,
-  node v22.17.1, npm 11.11.0, git 2.50.1 Apple. Prior re-stamp 2026-07-01 covered
-  WSL/Linux and re-pinned Codex to 0.142.4 after out-of-band drift; prior re-stamp
-  2026-06-21 migrated Codex off the macOS Homebrew cask to npm.)
+- **Last re-stamped:** 2026-07-10 (WSL/Linux update: Codex pin DELIBERATELY BUMPED
+  0.142.4 -> 0.144.1 after a full sandbox preflight (CODEX_HOME clone + npx candidate:
+  forward/backward config parse both green, sync `mcp add` wiring schema byte-identical
+  with no `transport` field, exec/mcp-add flags unchanged, `-s read-only` honored,
+  PreToolUse hook trust survived the live upgrade). The pin now has a canonical
+  machine-readable home - dotfiles `manifest.sh CODEX_PIN` / `manifest.ps1 $CodexPin` -
+  enforced by a warn-on-drift check in both syncs (parity-gated) and bumpable via
+  `~/.dotfiles/scripts/codex-pin-preflight.sh <version>`. macOS + the Windows PC must
+  install 0.144.1 at their next sync (lockstep). Also: Gemini CLI 0.49.0 -> 0.50.0;
+  Claude Code found already at npm latest 2.1.206. Verified `codex exec` default
+  sandbox on this WSL machine is `danger-full-access` (on 0.142.4 AND 0.144.1), so
+  cross-check must keep passing `-s read-only`. Toolchain this machine: WSL2,
+  node v22.23.1, npm 10.9.8, git 2.34.1. Prior re-stamp 2026-07-02 covered macOS;
+  2026-07-01 re-pinned Codex on WSL after out-of-band drift; 2026-06-21 migrated
+  Codex off the macOS Homebrew cask to npm.)
 - **Built/verified on:** macOS (darwin). Note: `timeout` is absent on macOS; use
   `gtimeout` (coreutils) or the harness timeout. `gtimeout` was NOT installed at
   build time.
@@ -22,9 +29,9 @@ versions against. This is the system-level analog of a `package-lock.json`.
 
 | Tool | Baseline version | Notes |
 |------|------------------|-------|
-| Claude Code | 2.1.198 | latest on 2026-07-02 (`npm view @anthropic-ai/claude-code version`); npm global under nvm only after removing duplicate Homebrew-prefix npm global install |
-| Codex CLI | 0.142.4 | model GPT-5.5; npm global under nvm, PINNED (re-pinned 2026-07-01 to match installed; do NOT float to 0.142.5 without deliberate pin bump). `codex exec` sandbox default is version-volatile - 2026-07-02 macOS 0.142.4 default was `danger-full-access`; always pass `-s read-only` |
-| Gemini CLI | 0.49.0 | latest on 2026-07-02 (`npm view @google/gemini-cli version`); `gemini --approval-mode plan` is read-only plan mode for cross-check verification calls (re-confirmed 2026-07-02 on 0.49.0 `--help`: `plan (read-only mode)`). Free Code Assist login ended 2026-06-18, metered after |
+| Claude Code | 2.1.206 | latest on 2026-07-10 (`npm view @anthropic-ai/claude-code version`); npm global (macOS: under nvm only, after removing the duplicate Homebrew-prefix install) |
+| Codex CLI | 0.144.1 | model GPT-5.5; npm global, PINNED - canonical pin lives in dotfiles `manifest.sh CODEX_PIN` (+ `manifest.ps1 $CodexPin`), both syncs warn on drift; bump ONLY via `~/.dotfiles/scripts/codex-pin-preflight.sh <version>` (pin bumped 2026-07-10 from 0.142.4 after preflight PASS). `codex exec` sandbox default is version-volatile - `danger-full-access` on 2026-07-02 macOS 0.142.4 and 2026-07-10 WSL 0.142.4/0.144.1; always pass `-s read-only` |
+| Gemini CLI | 0.50.0 | latest on 2026-07-10 (`npm view @google/gemini-cli version`); `gemini --approval-mode plan` is read-only plan mode for cross-check verification calls (re-confirmed 2026-07-10 on 0.50.0 `--help`: `plan (read-only mode)`). Free Code Assist login ended 2026-06-18, metered after |
 | node | 22.17.1 | the gate checks are plain ESM `.mjs` |
 | npm | 11.11.0 | |
 | git | 2.50.1 (Apple) | |
@@ -44,13 +51,14 @@ versions against. This is the system-level analog of a `package-lock.json`.
   constitution/rules file every agent reads. Hooks are Claude-Code-specific. The
   invariant LIVES in CI; each agent gets the best in-loop enforcement its own harness
   supports (Codex has `/review` + an OS sandbox; Gemini has its own).
-- **Cross-vendor CLI dispatch (the cross-check skill), re-verified 2026-07-02:** the
+- **Cross-vendor CLI dispatch (the cross-check skill), re-verified 2026-07-10:** the
   `codex exec` sandbox default is VERSION-VOLATILE - `workspace-write` on 0.139.0,
-  `read-only` on 0.140.0, and `danger-full-access` on this 0.142.4 macOS run
-  (disk-verified via the `codex exec` session header). So ALWAYS pass
+  `read-only` on 0.140.0, and `danger-full-access` on 0.142.4 macOS (2026-07-02) and
+  on 0.142.4/0.144.1 WSL (2026-07-10; all disk-verified via the `codex exec` session
+  header). So ALWAYS pass
   `--sandbox read-only` (`-s read-only`) explicitly and never depend on the default.
   `gemini --approval-mode plan` remains read-only for cross-check verification calls
-  (0.49.0 `--help` documents `plan (read-only mode)`). And a Claude Code Task/Workflow SUBAGENT's
+  (0.50.0 `--help` documents `plan (read-only mode)`). And a Claude Code Task/Workflow SUBAGENT's
   sandbox classifier blocks the vendor-CLI call as private-source exfiltration, so the
   dispatch must run in the main loop (sandbox disabled for that call) or behind an explicit
   `codex`/`gemini` Bash allowlist; the worker context-hygiene benefit is then traded off.
@@ -81,3 +89,8 @@ Run `coding-mastermind-update`: it reads this file, fetches current tool version
 (`npm view @anthropic-ai/claude-code version` and the Codex/Gemini equivalents +
 their changelogs), diffs against the capability facts above, and proposes a
 changes list + a re-stamped MANIFEST for approval. It PROPOSES, never auto-applies.
+
+Codex pin bumps additionally go through `~/.dotfiles/scripts/codex-pin-preflight.sh
+<version>` (sandboxed forward/backward config-compat proof against a CODEX_HOME clone)
+BEFORE the pin moves in dotfiles `manifest.sh`/`manifest.ps1`; then every machine
+installs the exact new pin at its next sync (lockstep).
